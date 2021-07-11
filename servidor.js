@@ -1,34 +1,25 @@
-import express from 'express';
-//const express = require('express');
+const express = require('express');
 const app = express();
 const PORT = 8080;
 
-import {Producto} from "./productosClase.js";
-//const Producto = require("./productosClase");
+let producto = require('./Productos');
   
 app.use(express.json());
-app.use(express.urlencoded());
-
-let productos = [];
+app.use(express.urlencoded({extended: true}));
 
 app.get('/productos', (req, res)=>{
-    if (productos.length == 0) {
-        res.send('{error: "no hay productos cargados"}')
-    } else {
-        res.send(productos)
-    }
+    res.send(producto.listarProductos)
 });
+
 app.post('/productos', (req, res)=>{
     let toAdd = req.body;
-    let prod = new Producto(toAdd.title, toAdd.price, toAdd.thumbnail, 1);
-    productos.push(prod);
+    let prod = producto.nuevoProd(toAdd);
     res.send(prod)
 });
 
 app.get('/productos/:id', (req, res)=>{
-    let id = parseInt(req.params.id);
-    let prodId = productos.find(producto => {producto.id == id});
-    res.send(prodId)
+    let id = req.params.id;
+    res.send(producto.filtrarId(id))
 })
 
 app.listen(PORT, (err) => {
